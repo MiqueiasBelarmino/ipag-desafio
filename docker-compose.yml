@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  api:
+    build: ./api
+    container_name: ipag_api
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: ipag_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ipagdb
+      MYSQL_USER: ipag
+      MYSQL_PASSWORD: ipag123
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  db_data:
