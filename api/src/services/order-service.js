@@ -1,15 +1,7 @@
 const orderRepository = require('../repositories/order-repository');
 const customerRepository = require('../repositories/customer-repository');
-
-const statusTransitions = {
-    PENDING: ['WAITING_PAYMENT', 'CANCELLED'],
-    WAITING_PAYMENT: ['PAID', 'CANCELLED'],
-    PAID: ['PROCESSING', 'CANCELLED'],
-    PROCESSING: ['SHIPPED', 'CANCELLED'],
-    SHIPPED: ['DELIVERED'],
-    DELIVERED: [],
-    CANCELLED: []
-};
+const notificationLogService = require('../services/notification-log-service');
+const { statusTransitions } = require('../utils/status-transitions');
 
 async function create(data) {
     return orderRepository.create(data);
@@ -44,7 +36,16 @@ async function updateStatus(id, status) {
         throw new Error(`Order cannot be updated to this status when it is ${order.status}`);
     }
 
-    return orderRepository.updateStatus(id, status);
+    const response = orderRepository.updateStatus(id, status);
+
+    await notificationLogService.create({
+        order_id: order.id,
+        old_status: order.status,
+        new_status: status,
+        message: `INFO: Order ORD-${order.id} status changed from ${order.status} to ${status}`
+    });
+
+    return response;
 }
 
 async function getSummary() {

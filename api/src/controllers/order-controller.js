@@ -1,5 +1,6 @@
 const orderService = require('../services/order-service');
 const { z } = require('zod');
+const { orderStatus } = require('../utils/order-status');
 
 const orderSchema = z.object({
     items: z.array(z.object({
@@ -28,7 +29,7 @@ const customOrderSchema = z.object({
 });
 
 const orderUpdateSchema = z.object({
-    status: z.enum(['PENDING', 'WAITING_PAYMENT', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'])
+    status: z.enum(orderStatus)
 });
 
 async function create(req, res) {
