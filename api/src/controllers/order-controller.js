@@ -29,7 +29,8 @@ const customOrderSchema = z.object({
 });
 
 const orderUpdateSchema = z.object({
-    status: z.enum(orderStatus)
+    status: z.enum(orderStatus),
+    notes: z.string().max(500).optional()
 });
 
 async function create(req, res) {
@@ -89,7 +90,7 @@ async function updateStatus(req, res) {
     }
     
     try {
-        const order = await orderService.updateStatus(req.params.id, req.body.status);
+        const order = await orderService.updateStatus(req.params.id, req.body);
         if (!order) {
             return res.status(404).json({ message: 'order not found' });
         }

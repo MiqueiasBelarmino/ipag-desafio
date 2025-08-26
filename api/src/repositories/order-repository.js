@@ -50,10 +50,10 @@ async function findAll() {
     return knex('orders').select('*');
 }
 
-async function updateStatus(id, status) {
+async function updateStatus(id, {status, notes = null}) {
     await knex('orders')
         .where({ id })
-        .update({ status });
+        .update({ status, notes });
     return findById(id);
 }
 

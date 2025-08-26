@@ -47,7 +47,7 @@ async function findAll() {
     return orderRepository.findAll();
 }
 
-async function updateStatus(id, status) {
+async function updateStatus(id, {status, notes = null}) {
     const order = await orderRepository.findById(id);
     if (!order) {
         throw new Error('Order not found');
@@ -57,7 +57,7 @@ async function updateStatus(id, status) {
         throw new Error(`Order cannot be updated to this status when it is ${order.status}`);
     }
 
-    const response = orderRepository.updateStatus(id, status);
+    const response = orderRepository.updateStatus(id,{status, notes});
 
     await notificationLogService.create({
         order_id: order.id,
