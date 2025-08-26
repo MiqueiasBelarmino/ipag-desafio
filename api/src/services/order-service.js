@@ -1,4 +1,5 @@
 const orderRepository = require('../repositories/order-repository');
+const customerRepository = require('../repositories/customer-repository');
 
 const statusTransitions = {
     PENDING: ['WAITING_PAYMENT', 'CANCELLED'],
@@ -12,6 +13,17 @@ const statusTransitions = {
 
 async function create(data) {
     return orderRepository.create(data);
+}
+
+async function createCustomerAndOrder(data) {
+    const { customer, order } = data;
+    const createdCustomer = await customerRepository.create(customer);
+
+    const orderData = {
+        ...order,
+        customer_id: createdCustomer.id
+    };
+    return orderRepository.createCustomerAndOrder(orderData);
 }
 
 async function findById(id) {
@@ -35,9 +47,25 @@ async function updateStatus(id, status) {
     return orderRepository.updateStatus(id, status);
 }
 
+async function getSummary() {
+    const summary = await orderRepository.getSummary();
+
+    const formattedSummary = {};
+    summary.forEach(item => {
+        formattedSummary[item.status] = {
+            count: item.count,
+            total: item.total
+        };
+    });
+
+    return formattedSummary;
+}
+    
 module.exports = {
     create,
+    createCustomerAndOrder,
     findById,
     findAll,
     updateStatus,
+    getSummary
 }

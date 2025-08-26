@@ -10,6 +10,23 @@ const orderSchema = z.object({
     customer_id: z.number()
 });
 
+const customOrderSchema = z.object({
+    customer: z.object({
+        name: z.string().min(2).max(100),
+        document: z.string().min(9).max(14),
+        email: z.email(),
+        phone: z.string().min(10).max(15),
+    }),
+    order: z.object({
+        items: z.array(z.object({
+            product_name: z.string().min(2).max(100),
+            quantity: z.number().min(1),
+            unit_value: z.number().min(0)
+        })),
+        total_value: z.number()
+    })
+});
+
 const orderUpdateSchema = z.object({
     status: z.enum(['PENDING', 'WAITING_PAYMENT', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'])
 });
@@ -25,6 +42,19 @@ async function create(req, res) {
         return res.status(201).json(order);
     } catch (err) {
         return res.status(500).json({ message: 'Internal Error. Try again later.' });
+    }
+}
+
+async function createCustomerAndOrder(req, res) {
+    const result = customOrderSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.errors });
+    }
+    try {
+        const order = await orderService.createCustomerAndOrder(req.body);
+        return res.status(201).json(order);
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
     }
 }
 
@@ -68,9 +98,20 @@ async function updateStatus(req, res) {
     }
 }
 
+async function getSummary(req, res) {
+  try {
+    const summary = await orderService.getSummary();
+    res.json(summary);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 module.exports = {
     create,
+    createCustomerAndOrder,
     findById,
     findAll,
     updateStatus,
+    getSummary
 }
