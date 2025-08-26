@@ -56,15 +56,15 @@ async function updateStatus(req, res) {
     if (!result.success) {
         return res.status(400).json({ message: 'Invalid status' });
     }
-    const order = await orderService.updateStatus(req.params.id, req.body.status);
-    if (!order) {
-        return res.status(404).json({ message: 'order not found' });
-    }
+    
     try {
+        const order = await orderService.updateStatus(req.params.id, req.body.status);
+        if (!order) {
+            return res.status(404).json({ message: 'order not found' });
+        }
         return res.json(order);
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Internal Error. Try again later.' });
+        return res.status(500).json({ message: err?.message || 'Internal Error. Try again later.' });
     }
 }
 
