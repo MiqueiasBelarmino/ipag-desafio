@@ -1,4 +1,4 @@
-require('dotenv').config({ path: __dirname + '/../.env' });
+require('dotenv').config();
 
 module.exports = {
   development: {
@@ -11,7 +11,7 @@ module.exports = {
       port: process.env.DB_PORT
     },
     migrations: {
-      directory: "./migrations"
+      directory: "./src/database/migrations"
     }
   }
 };
