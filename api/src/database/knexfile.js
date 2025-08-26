@@ -1,5 +1,5 @@
-require('dotenv').config();
-
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 module.exports = {
   development: {
     client: "mysql2",
@@ -11,7 +11,7 @@ module.exports = {
       port: process.env.DB_PORT
     },
     migrations: {
-      directory: "./src/database/migrations"
+      directory: path.resolve(__dirname, "migrations")
     }
   }
 };
