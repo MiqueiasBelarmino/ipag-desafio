@@ -36,7 +36,10 @@ async function createCustomerAndOrder(data) {
     }));
 
     await knex('order_items').insert(orderItems);
-    return findById(orderId);
+    return {
+        order: await findById(orderId),
+        items: orderItems
+    }
 }
 
 async function findById(id) {

@@ -15,7 +15,28 @@ async function createCustomerAndOrder(data) {
         ...order,
         customer_id: createdCustomer.id
     };
-    return orderRepository.createCustomerAndOrder(orderData);
+    const createdOrder = await orderRepository.createCustomerAndOrder(orderData);
+
+    return {
+        order_id: `ORD-${createdOrder.order.id}`,
+        order_number: `ORD-${createdOrder.order.id}`,
+        status: createdOrder.order.status,
+        total_value: createdOrder.order.total_value,
+        customer: {
+            id: createdCustomer.id,
+            name: createdCustomer.name,
+            document: createdCustomer.document,
+            email: createdCustomer.email,
+            phone: createdCustomer.phone
+        },
+        items: createdOrder.items.map(i => ({
+            product_name: i.product_name,
+            quantity: i.quantity,
+            unit_value: i.unit_value,
+            total_value: i.total_value
+        })),
+        created_at: order.created_at
+    };
 }
 
 async function findById(id) {
