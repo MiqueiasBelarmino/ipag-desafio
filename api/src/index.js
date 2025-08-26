@@ -3,10 +3,12 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const express = require('express');
 const app = express();
-const customersRoutes = require('./routes/customer-routes');
+const customerRoutes = require('./routes/customer-routes');
+const orderRoutes = require('./routes/order-routes');
 
 app.use(express.json());
-app.use('/api', customersRoutes);
+app.use('/api', customerRoutes);
+app.use('/api', orderRoutes);
 
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, '0.0.0.0', () => {
