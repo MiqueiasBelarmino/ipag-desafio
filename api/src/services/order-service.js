@@ -2,6 +2,7 @@ const orderRepository = require('../repositories/order-repository');
 const customerRepository = require('../repositories/customer-repository');
 const notificationLogService = require('../services/notification-log-service');
 const { statusTransitions } = require('../utils/status-transitions');
+const { publishOrderStatusUpdate } = require('../publishers/order-publisher');
 
 async function create(data) {
     return orderRepository.create(data);
@@ -56,15 +57,14 @@ async function updateStatus(id, {status, notes = null}) {
     if(!statusTransitions[order.status].includes(status)) {
         throw new Error(`Order cannot be updated to this status when it is ${order.status}`);
     }
-
+    const mappedOrder = {
+        orderId: order.id,
+        oldStatus: order.status,
+        newStatus: status
+    };
     const response = orderRepository.updateStatus(id,{status, notes});
 
-    await notificationLogService.create({
-        order_id: order.id,
-        old_status: order.status,
-        new_status: status,
-        message: `INFO: Order ORD-${order.id} status changed from ${order.status} to ${status}`
-    });
+    await publishOrderStatusUpdate(mappedOrder);
 
     return response;
 }
