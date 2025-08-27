@@ -23,6 +23,13 @@ async function create(req, res) {
 }
 
 async function findById(req, res) {
+  const result = z.object({
+    id: z.number()
+  }).safeParse(req.params);
+  if (!result.success) {
+    return res.status(400).json({ errors: result.error.issues });
+  }
+
   try {
     const { id } = req.params;
     const log = await notificationLogService.findById(Number(id));
@@ -45,6 +52,13 @@ async function findAll(req, res) {
 }
 
 async function findByOrderId(req, res) {
+  const result = z.object({
+    orderId: z.number()
+  }).safeParse(req.params);
+  if (!result.success) {
+    return res.status(400).json({ errors: result.error.issues });
+  }
+
   try {
     const { orderId } = req.params;
     const logs = await notificationLogService.findByOrderId(Number(orderId));

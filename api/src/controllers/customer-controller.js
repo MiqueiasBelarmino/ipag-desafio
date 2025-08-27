@@ -27,12 +27,18 @@ async function create(req, res) {
             }
             return res.status(400).json({ message: 'Duplicate entry.' });
         }
-        console.error(err); // log interno para debug
         return res.status(500).json({ message: 'Internal Error. Try again later.' });
     }
 }
 
 async function findById(req, res) {
+    const result = z.object({
+        id: z.number()
+    }).safeParse(req.params);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.issues });
+    }
+
     const customer = await customerService.findById(req.params.id);
     if (!customer) {
         return res.status(404).json({ message: 'Customer not found' });
@@ -73,6 +79,13 @@ async function update(req, res) {
 }
 
 async function remove(req, res) {
+    const result = z.object({
+        id: z.number()
+    }).safeParse(req.params);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.issues });
+    }
+
     try {
         const result = await customerService.remove(req.params.id);
         if (!result) {

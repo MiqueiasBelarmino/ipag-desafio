@@ -36,7 +36,7 @@ const orderUpdateSchema = z.object({
 async function create(req, res) {
     const result = orderSchema.safeParse(req.body);
     if (!result.success) {
-        return res.status(400).json({ errors: result.error.errors });
+        return res.status(400).json({ errors: result.error.issues });
     }
 
     try {
@@ -50,7 +50,7 @@ async function create(req, res) {
 async function createCustomerAndOrder(req, res) {
     const result = customOrderSchema.safeParse(req.body);
     if (!result.success) {
-        return res.status(400).json({ errors: result.error.errors });
+        return res.status(400).json({ errors: result.error.issues });
     }
     try {
         const order = await orderService.createCustomerAndOrder(req.body);
@@ -61,6 +61,14 @@ async function createCustomerAndOrder(req, res) {
 }
 
 async function findById(req, res) {
+
+    const result = z.object({
+        id: z.number()
+    }).safeParse(req.params);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.issues });
+    }
+
     const order = await orderService.findById(req.params.id);
     if (!order) {
         return res.status(404).json({ message: 'order not found' });
@@ -92,7 +100,7 @@ async function updateStatus(req, res) {
     try {
         const order = await orderService.updateStatus(req.params.id, req.body);
         if (!order) {
-            return res.status(404).json({ message: 'order not found' });
+            return res.status(404).json({ message: 'Order not found' });
         }
         return res.json(order);
     } catch (err) {
