@@ -1,7 +1,15 @@
 # iPag Desafio — Order Management com RabbitMQ
 
-Este projeto implementa uma **API REST** para gestão de pedidos e um **Worker** que consome mensagens do **RabbitMQ** para registrar logs de notificações e processar mudanças de status.
+## Este projeto implementa uma **API REST** para gestão de pedidos e um **Worker** que consome mensagens do **RabbitMQ** para registrar logs de notificações e processar mudanças de status.
+### ⚠️ Por ora, devido a questões técnicas (me faltou certa profundidade de conhecimento) na utilização do RabbitMQ e, principalmente, estruturar o projeto para rodar totalmente pelo Docker, o worker não está totalmente desacoplado na solução proposta. Para fazer a atualização na tabela `notification_logs`, ele faz uma interação direta com a API.
 
+### ⚠️ Todas as tecnologias utilizadas e não utilizadas foram conscientes, inclusive a utilização de commonjs ao invés de ESM. A minha ideia é, independentemente do resultado do desafio, fazer propositalmente a migração do projeto para tecnologias de certa forma mais consolidadas e que tragam mais produtividade e segurança na arquitetura do projeto.
+
+## Possíveis mudanças estudadas:
+
+- Utilização de TypeScript
+- Substituir Knex por Prisma ORM
+  
 ---
 
 ## Tecnologias
