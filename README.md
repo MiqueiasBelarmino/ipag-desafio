@@ -8,10 +8,17 @@ Este projeto implementa uma **API REST** para gestão de pedidos e um **Worker**
 
 - Node.js (Express)
 - MySQL 8
-- RabbitMQ (Management UI)
+- RabbitMQ (amqplib)
+  - https://www.npmjs.com/package/amqplib
+  - https://www.cloudamqp.com/docs/nodejs.html
+  - https://medium.com/@obaff/rabbitmq-and-node-js-tutorial-1ef7c48089b7
 - Docker & Docker Compose
 - Knex.js (migrations e queries)
+  - https://knexjs.org/guide/schema-builder.html
 - Zod (validações)
+- Logging (winston)
+  - https://www.npmjs.com/package/winston
+  - https://www.luiztools.com.br/post/logging-de-aplicacoes-node-js-com-winston/
 
 ---
 
@@ -69,89 +76,7 @@ DEFAULT_ORDER_QUEUE=order_status_updates
 
 ## Docker Compose
 
-O `docker-compose.yml` esperado (ajuste se já possuir o seu):
-
-```yaml
-services:
-  api:
-    build: 
-      context: ./api
-      dockerfile: Dockerfile
-    container_name: ipag_api
-    restart: always
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - intranet
-
-  worker:
-    build: ./worker
-    container_name: ipag_worker
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      api:
-        condition: service_started
-    environment:
-      RABBITMQ_URL: amqp://ipag:ipag123@rabbitmq:5672
-      QUEUE_NAME: order_status_updates
-      API_URL: http://api:3000/api
-    networks:
-      - intranet
-
-  db:
-    image: mysql:8.0
-    container_name: ipag_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ipagdb
-      MYSQL_USER: ipag
-      MYSQL_PASSWORD: ipag123
-    ports:
-      - "3307:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - intranet
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: ipag_rabbitmq
-    restart: always
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: ipag
-      RABBITMQ_DEFAULT_PASS: ipag123
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - intranet
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "status"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-volumes:
-  db_data:
-  rabbitmq_data:
-
-networks:
-  intranet:
-    driver: bridge
-
-```
+O `docker-compose.yml` esperado está presente no repositório
 
 ---
 
