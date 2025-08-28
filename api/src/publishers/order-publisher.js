@@ -1,5 +1,6 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+const logger = require('../utils/logger');
 
 const { publish } = require('../services/rabbitmq');
 
@@ -14,6 +15,8 @@ async function publishOrderStatusUpdate({orderId, oldStatus, newStatus}) {
      };
 
     await publish(QUEUE_NAME, message);
+    logger.info('order-publisher:publishOrderStatusUpdate message queued', { message, queue: QUEUE_NAME});
+
 }
 
 

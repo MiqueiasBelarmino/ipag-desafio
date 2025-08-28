@@ -1,5 +1,8 @@
 const amqp = require("amqplib");
 const fetch = require("node-fetch");
+const logger = require("../utils/logger");
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://rabbitmq:5672";
 const QUEUE = process.env.QUEUE_NAME || "order_status_updates";
@@ -12,12 +15,9 @@ const API_URL = process.env.API_URL || "http://api:3000/api";
 
     await channel.assertQueue(QUEUE, { durable: true });
 
-    console.log(`[Worker] Aguardando mensagens na fila "${QUEUE}"...`);
-
     channel.consume(QUEUE, async (msg) => {
       if (msg !== null) {
         const content = JSON.parse(msg.content.toString());
-        console.log("[Worker] Mensagem recebida");
 
         try {
           const res = await fetch(`${API_URL}/notifications/log`, {
@@ -27,19 +27,18 @@ const API_URL = process.env.API_URL || "http://api:3000/api";
           });
 
           if (!res.ok) {
-            console.error("[Worker] Erro ao chamar API:", res.status, await res.text());
+            logger.error('[worker] notification-consumer:consumer API call failed', { error: res, queue: QUEUE});
           } else {
-            console.log("[Worker] Notificação enviada para API com sucesso!");
-            channel.ack(msg); // confirma processamento
+            channel.ack(msg);
           }
         } catch (err) {
-          console.error("[Worker] Falha ao enviar para API:", err.message);
-          // não dá ack → a msg volta pra fila
+          logger.error('[worker] notification-consumer:consumer failed', { error: err, queue: QUEUE});
         }
       }
     });
   } catch (err) {
-    console.error("[Worker] Erro de conexão:", err.message);
+    logger.error('[worker] notification-consumer:consumer connection failed', { error: err });
+
     process.exit(1);
   }
 })();
