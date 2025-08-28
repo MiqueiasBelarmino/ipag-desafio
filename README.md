@@ -27,6 +27,8 @@
 - Logging (winston)
   - https://www.npmjs.com/package/winston
   - https://www.luiztools.com.br/post/logging-de-aplicacoes-node-js-com-winston/
+- Testing (Jest)
+  - https://jestjs.io/docs/getting-started
 
 ---
 
