@@ -45,7 +45,14 @@ async function create(req, res) {
         const order = await orderService.create(req.body);
         return res.status(201).json(order);
     } catch (err) {
-        logger.error('order-controller:create', { request: req, error: err });
+        logger.error('order-controller:create', {
+            request: {
+                params: req.params,
+                body: req.body,
+                query: req.query
+            },
+            error: err
+        });
         return res.status(500).json({ message: 'Internal Error. Try again later.' });
     }
 }
@@ -60,7 +67,14 @@ async function createCustomerAndOrder(req, res) {
         const order = await orderService.createCustomerAndOrder(req.body);
         return res.status(201).json(order);
     } catch (err) {
-        logger.error('order-controller:createCustomerAndOrder', { request: req, error: err });
+        logger.error('order-controller:createCustomerAndOrder', {
+            request: {
+                params: req.params,
+                body: req.body,
+                query: req.query
+            },
+            error: err
+        });
         return res.status(500).json({ message: err.message });
     }
 }
@@ -71,7 +85,14 @@ async function findById(req, res) {
         id: z.number()
     }).safeParse(req.params);
     if (!result.success) {
-        logger.warn('Invalid param', { request: req.body, errors: result.error.issues });
+        logger.warn('order-controller:findAll', {
+            request: {
+                params: req.params,
+                body: req.body,
+                query: req.query
+            },
+            error: result.error.issues
+        });
         return res.status(400).json({ errors: result.error.issues });
     }
 
@@ -82,7 +103,14 @@ async function findById(req, res) {
     try {
         return res.json(order);
     } catch (err) {
-        logger.error('order-controller:findById', { request: req, error: err});
+        logger.error('order-controller:findById', {
+            request: {
+                params: req.params,
+                body: req.body,
+                query: req.query
+            },
+            error: err
+        });
         return res.status(500).json({ message: 'Internal Error. Try again later.' });
     }
 }
@@ -92,7 +120,14 @@ async function findAll(req, res) {
         const orders = await orderService.findAll();
         return res.json(orders);
     } catch (err) {
-        logger.error('order-controller:findAll', { request: req, error: err});
+        logger.error('order-controller:findAll', {
+            request: {
+                params: req.params,
+                body: req.body,
+                query: req.query
+            },
+            error: err
+        });
         return res.status(500).json({ message: 'Internal Error. Try again later.' });
     }
 }
@@ -110,7 +145,14 @@ async function updateStatus(req, res) {
         }
         return res.json(order);
     } catch (err) {
-        logger.error('order-controller:updateStatus', { request: req, error: err});
+        logger.error('order-controller:updateStatus', {
+            request: {
+                params: req.params,
+                body: req.body,
+                query: req.query
+            },
+            error: err
+        });
         return res.status(500).json({ message: err?.message || 'Internal Error. Try again later.' });
     }
 }
